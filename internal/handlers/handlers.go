@@ -12,7 +12,7 @@ type Router struct {
 
 func RegisterHandlers(cfg *config.ApiConfig, mux *http.ServeMux) {
 	router := &Router{cfg: cfg}
-	mux.HandleFunc("/healthz", router.HealthCheck)
+	mux.HandleFunc("GET /healthz", router.HealthCheck)
 }
 
 func (router *Router) HealthCheck(w http.ResponseWriter, r *http.Request) {

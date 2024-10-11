@@ -23,8 +23,8 @@ func main() {
 	)
 
 	mux.Handle("/app/", metrics.Count(fileServerHandler))
-	mux.HandleFunc("/metrics", metrics.Get)
-	mux.HandleFunc("/reset", metrics.Reset)
+	mux.HandleFunc("GET /metrics", metrics.Get)
+	mux.HandleFunc("POST /reset", metrics.Reset)
 
 	handlers.RegisterHandlers(cfg, mux)
 
