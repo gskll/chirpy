@@ -1,18 +1,32 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 
 	"github.com/gskll/chirpy2/internal/config"
+	"github.com/gskll/chirpy2/internal/database"
 	"github.com/gskll/chirpy2/internal/handlers"
 	"github.com/gskll/chirpy2/internal/middleware"
 )
 
 func main() {
+	godotenv.Load()
+	dbUrl := os.Getenv("DB_URL")
+	db, err := sql.Open("postgres", dbUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var (
+		dbQueries  = database.New(db)
 		mux        = http.NewServeMux()
-		cfg        = config.NewApiConfig()
+		cfg        = config.NewApiConfig(dbQueries)
 		middleware = middleware.NewMiddleware(cfg)
 	)
 
