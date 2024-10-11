@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -105,7 +106,7 @@ func (router *APIRouter) GetChirp(w http.ResponseWriter, r *http.Request) {
 	}
 	dbChirp, err := router.cfg.Db.GetChirp(r.Context(), chirpUUID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			respondWithError(w, http.StatusNotFound, "Chirp not found")
 			return
 		}
