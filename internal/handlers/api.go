@@ -41,7 +41,10 @@ func (router *APIRouter) ValidateChirpLength(w http.ResponseWriter, r *http.Requ
 	err = chirp.ValidateLength(params.Body)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]any{"valid": true})
+	cleaned := chirp.Clean(params.Body)
+
+	respondWithJSON(w, http.StatusOK, map[string]any{"cleaned_body": cleaned})
 }
