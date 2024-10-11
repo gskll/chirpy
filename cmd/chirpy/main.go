@@ -41,9 +41,11 @@ func main() {
 	handlers.RegisterAdminHandlers("/admin", cfg, mux)
 	handlers.RegisterAPIHandlers("/api", cfg, mux)
 
+	wrappedMux := middleware.Logger(mux)
+
 	port := "8080"
 	srv := &http.Server{
-		Handler: mux,
+		Handler: wrappedMux,
 		Addr:    ":" + port,
 	}
 
