@@ -41,7 +41,7 @@ func (router *APIRouter) UpgradeUser(w http.ResponseWriter, r *http.Request) {
 
 	err = router.cfg.Db.UpgradeUser(r.Context(), params.Data.UserId)
 	if err != nil {
-		handleDatabaseError(w, err)
+		handleDatabaseRowError(w, err)
 		return
 	}
 

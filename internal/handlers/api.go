@@ -64,7 +64,7 @@ func (router *APIRouter) DeleteChirp(w http.ResponseWriter, r *http.Request) {
 	}
 	dbChirp, err := router.cfg.Db.GetChirp(r.Context(), chirpUUID)
 	if err != nil {
-		handleDatabaseError(w, err)
+		handleDatabaseRowError(w, err)
 		return
 	}
 	chirp := chirp.NewChirp(dbChirp)
@@ -76,7 +76,7 @@ func (router *APIRouter) DeleteChirp(w http.ResponseWriter, r *http.Request) {
 
 	err = router.cfg.Db.DeleteChirp(r.Context(), chirpUUID)
 	if err != nil {
-		handleDatabaseError(w, err)
+		handleDatabaseRowError(w, err)
 		return
 	}
 
@@ -145,7 +145,7 @@ func (router *APIRouter) GetChirps(w http.ResponseWriter, r *http.Request) {
 		dbChirps, err = router.cfg.Db.GetChirps(r.Context())
 	}
 	if err != nil {
-		handleDatabaseError(w, err)
+		handleDatabaseRowError(w, err)
 		return
 	}
 
@@ -167,7 +167,7 @@ func (router *APIRouter) GetChirp(w http.ResponseWriter, r *http.Request) {
 	}
 	dbChirp, err := router.cfg.Db.GetChirp(r.Context(), chirpUUID)
 	if err != nil {
-		handleDatabaseError(w, err)
+		handleDatabaseRowError(w, err)
 		return
 	}
 	chirp := chirp.NewChirp(dbChirp)
@@ -175,7 +175,7 @@ func (router *APIRouter) GetChirp(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, chirp)
 }
 
-func handleDatabaseError(w http.ResponseWriter, err error) {
+func handleDatabaseRowError(w http.ResponseWriter, err error) {
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			respondWithError(w, http.StatusNotFound, err.Error())

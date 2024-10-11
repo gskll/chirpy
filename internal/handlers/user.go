@@ -18,7 +18,7 @@ func (router *APIRouter) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	}
 	dbToken, err := router.cfg.Db.GetRefreshToken(r.Context(), rToken)
 	if err != nil {
-		handleDatabaseError(w, err)
+		handleDatabaseRowError(w, err)
 		return
 	}
 	if dbToken.ExpiresAt.Before(time.Now()) || dbToken.RevokedAt.Valid {
@@ -137,7 +137,7 @@ func (router *APIRouter) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	dbUser, err := router.cfg.Db.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
-		handleDatabaseError(w, err)
+		handleDatabaseRowError(w, err)
 		return
 	}
 
