@@ -1,0 +1,1026 @@
+{
+	"info": {
+		"_postman_id": "9f96ef5e-8283-4219-a917-c703ef3b52c2",
+		"name": "chirpy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36355880"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "update user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"saul@bettercall.com\",\n  \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/users",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "update user",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"saul@bettercall.com\",\n  \"password\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/users",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 18:14:19 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "184"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"b72019da-ed31-4502-9655-171432e85709\",\n    \"created_at\": \"2024-10-11T20:11:47.574869Z\",\n    \"updated_at\": \"2024-10-11T20:14:19.620801Z\",\n    \"email\": \"saul@bettercall.com\",\n    \"is_chirpy_red\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"token\", jsonData.token);",
+									"pm.environment.set(\"refreshToken\", jsonData.refresh_token)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"mike@bettercall.com\",\n  \"password\": \"98765\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"mike@bettercall.com\",\n  \"password\": \"98765\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/login",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 18:12:15 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "486"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"b72019da-ed31-4502-9655-171432e85709\",\n    \"created_at\": \"2024-10-11T20:11:47.574869Z\",\n    \"updated_at\": \"2024-10-11T20:11:47.574869Z\",\n    \"email\": \"mike@bettercall.com\",\n    \"is_chirpy_red\": false,\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjaGlycHkiLCJzdWIiOiJiNzIwMTlkYS1lZDMxLTQ1MDItOTY1NS0xNzE0MzJlODU3MDkiLCJleHAiOjE3Mjg2NzM5MzUsImlhdCI6MTcyODY3MDMzNX0.UvIWNieNv4pvX-YYJtKn2qPdHoGfxPFRO3F35vP50EM\",\n    \"refresh_token\": \"68be1aca2c3255fd6449f7075584b3faff6854f1b24c989d15caf0fb9e505e95\"\n}"
+						}
+					]
+				},
+				{
+					"name": "create user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"userID\", jsonData.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"mike@bettercall.com\",\n  \"password\": \"98765\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/users",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "create user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"mike@bettercall.com\",\n  \"password\": \"98765\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/users",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 18:11:47 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "184"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"b72019da-ed31-4502-9655-171432e85709\",\n    \"created_at\": \"2024-10-11T20:11:47.574869Z\",\n    \"updated_at\": \"2024-10-11T20:11:47.574869Z\",\n    \"email\": \"mike@bettercall.com\",\n    \"is_chirpy_red\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "upgrade user",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "ApiKey f271c81ff7084ee5b99a5091b42d486e",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"user_id\": \"{{userID}}\"\n  },\n  \"event\": \"user.upgraded\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/polka/webhooks",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"polka",
+								"webhooks"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "upgrade user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"user_id\": \"{{userID}}\"\n  },\n  \"event\": \"user.upgraded\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/polka/webhooks",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"polka",
+										"webhooks"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 21:12:39 GMT"
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "refresh token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refreshToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/refresh",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"refresh"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "refresh token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/refresh",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"refresh"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 21:16:48 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "221"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjaGlycHkiLCJzdWIiOiIyMWI2NGY4ZC1lNDdmLTRhM2ItYTc3ZS1iNTBhNDVjYzZiOGIiLCJleHAiOjE3Mjg2ODUwMDgsImlhdCI6MTcyODY4MTQwOH0.4xD_2TVG4bvAAtnkIPVCy0eo6agHa4isJLxyRW0_DXE\"\n}"
+						}
+					]
+				},
+				{
+					"name": "revoke token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refreshToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/revoke",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"revoke"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "revoke token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/revoke",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"revoke"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 21:17:42 GMT"
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "chirps",
+			"item": [
+				{
+					"name": "create chirp",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"chirpID\", jsonData.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\"\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/api/chirps",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"chirps"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "create chirp",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\"\n}"
+								},
+								"url": {
+									"raw": "localhost:8080/api/chirps",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"chirps"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 21:20:09 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "311"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"f70ffdde-2982-4eee-98da-cf13da17c97a\",\n    \"user_id\": \"21b64f8d-e47f-4a3b-a77e-b50a45cc6b8b\",\n    \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\",\n    \"created_at\": \"2024-10-11T23:20:09.317735Z\",\n    \"updated_at\": \"2024-10-11T23:20:09.317735Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "get chirps",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/chirps?sort=desc&author_id={{userID}}",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"chirps"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "author_id",
+									"value": "{{userID}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "get all chirps sorted default asc",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/chirps",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"chirps"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 21:22:08 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1328"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"b1cbed3d-5270-48cd-abd1-aabf999ccdec\",\n        \"user_id\": \"21b64f8d-e47f-4a3b-a77e-b50a45cc6b8b\",\n        \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\",\n        \"created_at\": \"2024-10-11T23:18:49.367724Z\",\n        \"updated_at\": \"2024-10-11T23:18:49.367724Z\"\n    },\n    {\n        \"id\": \"f70ffdde-2982-4eee-98da-cf13da17c97a\",\n        \"user_id\": \"21b64f8d-e47f-4a3b-a77e-b50a45cc6b8b\",\n        \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\",\n        \"created_at\": \"2024-10-11T23:20:09.317735Z\",\n        \"updated_at\": \"2024-10-11T23:20:09.317735Z\"\n    },\n    {\n        \"id\": \"fa4121c7-c95e-4c39-be17-8da71c100da7\",\n        \"user_id\": \"21b64f8d-e47f-4a3b-a77e-b50a45cc6b8b\",\n        \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\",\n        \"created_at\": \"2024-10-11T23:20:59.427521Z\",\n        \"updated_at\": \"2024-10-11T23:20:59.427521Z\"\n    },\n    {\n        \"id\": \"96cacee5-c580-4f97-9ad3-10c3d438ec88\",\n        \"user_id\": \"ce6bc500-d25f-44e6-98ef-6b7147202ff6\",\n        \"body\": \"weeee\",\n        \"created_at\": \"2024-10-11T23:21:54.540082Z\",\n        \"updated_at\": \"2024-10-11T23:21:54.540082Z\"\n    },\n    {\n        \"id\": \"739901ac-c507-418e-9556-3ea457625c86\",\n        \"user_id\": \"ce6bc500-d25f-44e6-98ef-6b7147202ff6\",\n        \"body\": \"wooooo\",\n        \"created_at\": \"2024-10-11T23:21:57.109506Z\",\n        \"updated_at\": \"2024-10-11T23:21:57.109506Z\"\n    }\n]"
+						},
+						{
+							"name": "get all chirps sort desc",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/chirps?sort=desc",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"chirps"
+									],
+									"query": [
+										{
+											"key": "sort",
+											"value": "desc"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 21:23:05 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1328"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"739901ac-c507-418e-9556-3ea457625c86\",\n        \"user_id\": \"ce6bc500-d25f-44e6-98ef-6b7147202ff6\",\n        \"body\": \"wooooo\",\n        \"created_at\": \"2024-10-11T23:21:57.109506Z\",\n        \"updated_at\": \"2024-10-11T23:21:57.109506Z\"\n    },\n    {\n        \"id\": \"96cacee5-c580-4f97-9ad3-10c3d438ec88\",\n        \"user_id\": \"ce6bc500-d25f-44e6-98ef-6b7147202ff6\",\n        \"body\": \"weeee\",\n        \"created_at\": \"2024-10-11T23:21:54.540082Z\",\n        \"updated_at\": \"2024-10-11T23:21:54.540082Z\"\n    },\n    {\n        \"id\": \"fa4121c7-c95e-4c39-be17-8da71c100da7\",\n        \"user_id\": \"21b64f8d-e47f-4a3b-a77e-b50a45cc6b8b\",\n        \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\",\n        \"created_at\": \"2024-10-11T23:20:59.427521Z\",\n        \"updated_at\": \"2024-10-11T23:20:59.427521Z\"\n    },\n    {\n        \"id\": \"f70ffdde-2982-4eee-98da-cf13da17c97a\",\n        \"user_id\": \"21b64f8d-e47f-4a3b-a77e-b50a45cc6b8b\",\n        \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\",\n        \"created_at\": \"2024-10-11T23:20:09.317735Z\",\n        \"updated_at\": \"2024-10-11T23:20:09.317735Z\"\n    },\n    {\n        \"id\": \"b1cbed3d-5270-48cd-abd1-aabf999ccdec\",\n        \"user_id\": \"21b64f8d-e47f-4a3b-a77e-b50a45cc6b8b\",\n        \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\",\n        \"created_at\": \"2024-10-11T23:18:49.367724Z\",\n        \"updated_at\": \"2024-10-11T23:18:49.367724Z\"\n    }\n]"
+						},
+						{
+							"name": "get sorted chirps from user",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/chirps?sort=desc&author_id={{userID}}",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"chirps"
+									],
+									"query": [
+										{
+											"key": "sort",
+											"value": "desc"
+										},
+										{
+											"key": "author_id",
+											"value": "{{userID}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 21:23:32 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "395"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"739901ac-c507-418e-9556-3ea457625c86\",\n        \"user_id\": \"ce6bc500-d25f-44e6-98ef-6b7147202ff6\",\n        \"body\": \"wooooo\",\n        \"created_at\": \"2024-10-11T23:21:57.109506Z\",\n        \"updated_at\": \"2024-10-11T23:21:57.109506Z\"\n    },\n    {\n        \"id\": \"96cacee5-c580-4f97-9ad3-10c3d438ec88\",\n        \"user_id\": \"ce6bc500-d25f-44e6-98ef-6b7147202ff6\",\n        \"body\": \"weeee\",\n        \"created_at\": \"2024-10-11T23:21:54.540082Z\",\n        \"updated_at\": \"2024-10-11T23:21:54.540082Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "get chirp",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/chirps/{{chirpID}}",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"chirps",
+								"{{chirpID}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "get chirp",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/chirps/{{chirpID}}",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"chirps",
+										"{{chirpID}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 21:20:37 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "311"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"f70ffdde-2982-4eee-98da-cf13da17c97a\",\n    \"user_id\": \"21b64f8d-e47f-4a3b-a77e-b50a45cc6b8b\",\n    \"body\": \"Clearly his taste in women is the same as his taste in lawyers: only the very best... with just a right amount of dirty!\",\n    \"created_at\": \"2024-10-11T23:20:09.317735Z\",\n    \"updated_at\": \"2024-10-11T23:20:09.317735Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "delete chirp",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/chirps/{{chirpID}}",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"chirps",
+								"{{chirpID}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "delete chirp",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/chirps/{{chirpID}}",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"chirps",
+										"{{chirpID}}"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 11 Oct 2024 21:25:16 GMT"
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "get metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/admin/metrics",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"metrics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reset metrics",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/admin/reset",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "health check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/healthz",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"healthz"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "homepage",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/app/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"app",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "app image",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/app/assets/logo.png",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"app",
+						"assets",
+						"logo.png"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
