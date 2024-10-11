@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gskll/chirpy2/internal/chirp"
 	"github.com/gskll/chirpy2/internal/config"
 )
 
@@ -37,9 +38,9 @@ func (router *APIRouter) ValidateChirpLength(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if len(params.Body) > 140 {
-		respondWithError(w, http.StatusBadRequest, "Chirp is too long. Max 140 chars")
-		return
+	err = chirp.ValidateLength(params.Body)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
 	}
 
 	respondWithJSON(w, http.StatusOK, map[string]any{"valid": true})
