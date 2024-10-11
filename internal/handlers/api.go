@@ -27,6 +27,7 @@ func RegisterAPIHandlers(prefix string, cfg *config.ApiConfig, mux *http.ServeMu
 	mux.HandleFunc("POST "+prefix+"/login", router.LoginUser)
 	mux.HandleFunc("POST "+prefix+"/refresh", router.RefreshToken)
 	mux.HandleFunc("POST "+prefix+"/revoke", router.RevokeRefreshToken)
+	mux.HandleFunc("PUT "+prefix+"/users", router.UpdateUserDetails)
 
 	mux.HandleFunc("POST "+prefix+"/chirps", router.CreateChirp)
 	mux.HandleFunc("GET "+prefix+"/chirps", router.GetChirps)

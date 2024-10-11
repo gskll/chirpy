@@ -56,6 +56,48 @@ func (router *APIRouter) RevokeRefreshToken(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func (router *APIRouter) UpdateUserDetails(w http.ResponseWriter, r *http.Request) {
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	userId, err := auth.ValidateJWT(token, router.cfg.JWTSecret)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	params := struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	hashedPassword, err := auth.HashPassword(params.Password)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	updatedDbUser, err := router.cfg.Db.UpdateUserEmailAndPassword(
+		r.Context(),
+		database.UpdateUserEmailAndPasswordParams{Email: params.Email, HashedPassword: hashedPassword, ID: userId},
+	)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	user := user.NewUser(updatedDbUser)
+
+	respondWithJSON(w, http.StatusOK, user)
+}
+
 func (router *APIRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 	type reqParams struct {
 		Email    string `json:"email"`
