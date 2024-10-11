@@ -135,11 +135,28 @@ func (router *APIRouter) CreateChirp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (router *APIRouter) GetChirps(w http.ResponseWriter, r *http.Request) {
-	dbChirps, err := router.cfg.Db.GetChirps(r.Context())
+	var (
+		dbChirps []database.Chirp
+		err      error
+	)
+
+	authorId := r.URL.Query().Get("author_id")
+	if authorId != "" {
+		authorUUID, err := uuid.Parse(authorId)
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, "Invalid author id")
+			return
+		}
+
+		dbChirps, err = router.cfg.Db.GetChirpsByAuthor(r.Context(), authorUUID)
+	} else {
+		dbChirps, err = router.cfg.Db.GetChirps(r.Context())
+	}
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		handleDatabaseError(w, err)
 		return
 	}
+
 	chirps := make([]chirp.Chirp, 0, len(dbChirps))
 	for _, dbChirp := range dbChirps {
 		chirp := chirp.NewChirp(dbChirp)
@@ -168,4 +185,15 @@ func (router *APIRouter) GetChirp(w http.ResponseWriter, r *http.Request) {
 	chirp := chirp.NewChirp(dbChirp)
 
 	respondWithJSON(w, http.StatusOK, chirp)
+}
+
+func handleDatabaseError(w http.ResponseWriter, err error) {
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			respondWithError(w, http.StatusNotFound, err.Error())
+			return
+		}
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 }
