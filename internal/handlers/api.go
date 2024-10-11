@@ -132,6 +132,10 @@ func (router *APIRouter) GetChirps(w http.ResponseWriter, r *http.Request) {
 		err      error
 	)
 
+	sort := r.URL.Query().Get("sort")
+	if sort != "desc" && sort != "asc" {
+		sort = "asc"
+	}
 	authorId := r.URL.Query().Get("author_id")
 	if authorId != "" {
 		authorUUID, err := uuid.Parse(authorId)
@@ -140,9 +144,12 @@ func (router *APIRouter) GetChirps(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		dbChirps, err = router.cfg.Db.GetChirpsByAuthor(r.Context(), authorUUID)
+		dbChirps, err = router.cfg.Db.GetChirpsByAuthor(
+			r.Context(),
+			database.GetChirpsByAuthorParams{UserID: authorUUID, Sort: sort},
+		)
 	} else {
-		dbChirps, err = router.cfg.Db.GetChirps(r.Context())
+		dbChirps, err = router.cfg.Db.GetChirps(r.Context(), sort)
 	}
 	if err != nil {
 		handleDatabaseRowError(w, err)

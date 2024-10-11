@@ -71,11 +71,13 @@ func (q *Queries) GetChirp(ctx context.Context, id uuid.UUID) (Chirp, error) {
 
 const getChirps = `-- name: GetChirps :many
 SELECT id, user_id, body, created_at, updated_at FROM chirps
-ORDER BY created_at ASC
+ORDER BY
+    CASE WHEN $1::text = 'asc' THEN created_at END ASC,
+    CASE WHEN $1::text = 'desc' THEN created_at END DESC
 `
 
-func (q *Queries) GetChirps(ctx context.Context) ([]Chirp, error) {
-	rows, err := q.db.QueryContext(ctx, getChirps)
+func (q *Queries) GetChirps(ctx context.Context, sort string) ([]Chirp, error) {
+	rows, err := q.db.QueryContext(ctx, getChirps, sort)
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +108,18 @@ func (q *Queries) GetChirps(ctx context.Context) ([]Chirp, error) {
 const getChirpsByAuthor = `-- name: GetChirpsByAuthor :many
 SELECT id, user_id, body, created_at, updated_at FROM chirps
 WHERE user_id = $1
-ORDER BY created_at ASC
+ORDER BY
+    CASE WHEN $2::text = 'asc' THEN created_at END ASC,
+    CASE WHEN $2::text = 'desc' THEN created_at END DESC
 `
 
-func (q *Queries) GetChirpsByAuthor(ctx context.Context, userID uuid.UUID) ([]Chirp, error) {
-	rows, err := q.db.QueryContext(ctx, getChirpsByAuthor, userID)
+type GetChirpsByAuthorParams struct {
+	UserID uuid.UUID
+	Sort   string
+}
+
+func (q *Queries) GetChirpsByAuthor(ctx context.Context, arg GetChirpsByAuthorParams) ([]Chirp, error) {
+	rows, err := q.db.QueryContext(ctx, getChirpsByAuthor, arg.UserID, arg.Sort)
 	if err != nil {
 		return nil, err
 	}

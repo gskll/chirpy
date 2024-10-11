@@ -11,12 +11,16 @@ RETURNING *;
 
 -- name: GetChirps :many
 SELECT * FROM chirps
-ORDER BY created_at ASC;
+ORDER BY
+    CASE WHEN @sort::text = 'asc' THEN created_at END ASC,
+    CASE WHEN @sort::text = 'desc' THEN created_at END DESC;
 
 -- name: GetChirpsByAuthor :many
 SELECT * FROM chirps
 WHERE user_id = $1
-ORDER BY created_at ASC;
+ORDER BY
+    CASE WHEN @sort::text = 'asc' THEN created_at END ASC,
+    CASE WHEN @sort::text = 'desc' THEN created_at END DESC;
 
 -- name: GetChirp :one
 SELECT * FROM chirps
