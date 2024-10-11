@@ -22,6 +22,7 @@ func RegisterAPIHandlers(prefix string, cfg *config.ApiConfig, mux *http.ServeMu
 	mux.HandleFunc("GET "+prefix+"/healthz", router.HealthCheck)
 	mux.HandleFunc("POST "+prefix+"/users", router.CreateUser)
 	mux.HandleFunc("POST "+prefix+"/chirps", router.CreateChirp)
+	mux.HandleFunc("GET "+prefix+"/chirps", router.GetChirps)
 }
 
 func (router *APIRouter) HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -81,4 +82,19 @@ func (router *APIRouter) CreateChirp(w http.ResponseWriter, r *http.Request) {
 	chirp := chirp.NewChirp(dbChirp)
 
 	respondWithJSON(w, http.StatusCreated, chirp)
+}
+
+func (router *APIRouter) GetChirps(w http.ResponseWriter, r *http.Request) {
+	dbChirps, err := router.cfg.Db.GetChirps(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	chirps := make([]chirp.Chirp, 0, len(dbChirps))
+	for _, dbChirp := range dbChirps {
+		chirp := chirp.NewChirp(dbChirp)
+		chirps = append(chirps, chirp)
+	}
+
+	respondWithJSON(w, http.StatusOK, chirps)
 }
