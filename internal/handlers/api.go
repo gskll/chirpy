@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -70,14 +71,20 @@ func (router *APIRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func (router *APIRouter) LoginUser(w http.ResponseWriter, r *http.Request) {
 	type reqParams struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Email            string        `json:"email"`
+		Password         string        `json:"password"`
+		ExpiresInSeconds time.Duration `json:"expires_in_seconds"`
 	}
 
 	params := reqParams{}
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	tokenExpires := time.Duration(params.ExpiresInSeconds * time.Second)
+	if params.ExpiresInSeconds == 0 || tokenExpires > time.Hour {
+		tokenExpires = time.Hour
 	}
 
 	dbUser, err := router.cfg.Db.GetUserByEmail(r.Context(), params.Email)
@@ -96,15 +103,32 @@ func (router *APIRouter) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := user.NewUser(dbUser)
+	token, err := auth.MakeJWT(dbUser.ID, router.cfg.JWTSecret, tokenExpires)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	respondWithJSON(w, http.StatusCreated, user)
+	user := user.NewUserWithToken(dbUser, token)
+
+	respondWithJSON(w, http.StatusOK, user)
 }
 
 func (router *APIRouter) CreateChirp(w http.ResponseWriter, r *http.Request) {
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	userId, err := auth.ValidateJWT(token, router.cfg.JWTSecret)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
 	type reqParams struct {
-		Body   string    `json:"body"`
-		UserId uuid.UUID `json:"user_id"`
+		Body string `json:"body"`
 	}
 
 	params := reqParams{}
@@ -113,7 +137,7 @@ func (router *APIRouter) CreateChirp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := chirp.ValidateLength(params.Body)
+	err = chirp.ValidateLength(params.Body)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
@@ -122,7 +146,7 @@ func (router *APIRouter) CreateChirp(w http.ResponseWriter, r *http.Request) {
 
 	dbChirp, err := router.cfg.Db.CreateChirp(
 		r.Context(),
-		database.CreateChirpParams{Body: cleaned, UserID: params.UserId},
+		database.CreateChirpParams{Body: cleaned, UserID: userId},
 	)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
