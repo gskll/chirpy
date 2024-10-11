@@ -26,6 +26,8 @@ func RegisterAPIHandlers(prefix string, cfg *config.ApiConfig, mux *http.ServeMu
 
 	mux.HandleFunc("POST "+prefix+"/users", router.CreateUser)
 	mux.HandleFunc("POST "+prefix+"/login", router.LoginUser)
+	mux.HandleFunc("POST "+prefix+"/refresh", router.RefreshToken)
+	mux.HandleFunc("POST "+prefix+"/revoke", router.RevokeRefreshToken)
 
 	mux.HandleFunc("POST "+prefix+"/chirps", router.CreateChirp)
 	mux.HandleFunc("GET "+prefix+"/chirps", router.GetChirps)
@@ -36,6 +38,50 @@ func (router *APIRouter) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
+}
+
+func (router *APIRouter) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	rToken, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+	dbToken, err := router.cfg.Db.GetRefreshToken(r.Context(), rToken)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			respondWithError(w, http.StatusUnauthorized, err.Error())
+			return
+		}
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if dbToken.ExpiresAt.Before(time.Now()) || dbToken.RevokedAt.Valid {
+		respondWithError(w, http.StatusUnauthorized, "token expired")
+		return
+	}
+
+	token, err := auth.MakeJWT(dbToken.UserID, router.cfg.JWTSecret, time.Hour)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"token": token})
+}
+
+func (router *APIRouter) RevokeRefreshToken(w http.ResponseWriter, r *http.Request) {
+	rToken, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+	err = router.cfg.Db.RevokeRefreshToken(r.Context(), rToken)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (router *APIRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -71,20 +117,14 @@ func (router *APIRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func (router *APIRouter) LoginUser(w http.ResponseWriter, r *http.Request) {
 	type reqParams struct {
-		Email            string        `json:"email"`
-		Password         string        `json:"password"`
-		ExpiresInSeconds time.Duration `json:"expires_in_seconds"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 
 	params := reqParams{}
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
-	}
-
-	tokenExpires := time.Duration(params.ExpiresInSeconds * time.Second)
-	if params.ExpiresInSeconds == 0 || tokenExpires > time.Hour {
-		tokenExpires = time.Hour
 	}
 
 	dbUser, err := router.cfg.Db.GetUserByEmail(r.Context(), params.Email)
@@ -103,13 +143,27 @@ func (router *APIRouter) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := auth.MakeJWT(dbUser.ID, router.cfg.JWTSecret, tokenExpires)
+	token, err := auth.MakeJWT(dbUser.ID, router.cfg.JWTSecret, time.Hour)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	user := user.NewUserWithToken(dbUser, token)
+	refreshToken, err := auth.MakeRefreshToken()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	err = router.cfg.Db.CreateRefreshToken(
+		r.Context(),
+		database.CreateRefreshTokenParams{Token: refreshToken, UserID: dbUser.ID},
+	)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	user := user.NewUserWithTokens(dbUser, token, refreshToken)
 
 	respondWithJSON(w, http.StatusOK, user)
 }
