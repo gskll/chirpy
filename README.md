@@ -30,7 +30,7 @@
 - Create a database: `createDb chirpy`
 
 - Clone `.env.dist` to `.env`
-  - `DB_URL` is the postgres connection string: `"postgres://andrewgaskell:@localhost:5432/chirpy"`
+  - `DB_URL` is the postgres connection string with ssl disabled: `"postgres://<user>:<pw>@localhost:5432/chirpy?sslmode=disable"`
   - `PLATFORM` should just be `dev`
   - `JWT_SECRET` any random secret to use for jwts
   - `POLKA_KEY` your 'api key' for the polka webhook
@@ -45,10 +45,12 @@ NOTE: for the `JWT_SECRET` and `POLKA_KEY` it can be anything. I just generated 
 
 ### 4. Run the server
 
-- `make run`
+- `make run` from project root
 - server should be running on `localhost:8080`
 
 ## Endpoints
+
+! Note: can see examples in the Postman collection file `chirpy.postman_collection.json`
 
 ### App
 
