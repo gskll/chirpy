@@ -64,11 +64,7 @@ func (router *APIRouter) DeleteChirp(w http.ResponseWriter, r *http.Request) {
 	}
 	dbChirp, err := router.cfg.Db.GetChirp(r.Context(), chirpUUID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			respondWithError(w, http.StatusNotFound, "Chirp not found")
-			return
-		}
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		handleDatabaseError(w, err)
 		return
 	}
 	chirp := chirp.NewChirp(dbChirp)
@@ -80,11 +76,7 @@ func (router *APIRouter) DeleteChirp(w http.ResponseWriter, r *http.Request) {
 
 	err = router.cfg.Db.DeleteChirp(r.Context(), chirpUUID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			respondWithError(w, http.StatusNotFound, "Chirp not found")
-			return
-		}
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		handleDatabaseError(w, err)
 		return
 	}
 
@@ -175,11 +167,7 @@ func (router *APIRouter) GetChirp(w http.ResponseWriter, r *http.Request) {
 	}
 	dbChirp, err := router.cfg.Db.GetChirp(r.Context(), chirpUUID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			respondWithError(w, http.StatusNotFound, "Chirp not found")
-			return
-		}
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		handleDatabaseError(w, err)
 		return
 	}
 	chirp := chirp.NewChirp(dbChirp)

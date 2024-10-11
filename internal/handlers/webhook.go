@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -43,11 +41,7 @@ func (router *APIRouter) UpgradeUser(w http.ResponseWriter, r *http.Request) {
 
 	err = router.cfg.Db.UpgradeUser(r.Context(), params.Data.UserId)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			respondWithError(w, http.StatusNotFound, err.Error())
-			return
-		}
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		handleDatabaseError(w, err)
 		return
 	}
 

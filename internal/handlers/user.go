@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"time"
 
@@ -20,11 +18,7 @@ func (router *APIRouter) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	}
 	dbToken, err := router.cfg.Db.GetRefreshToken(r.Context(), rToken)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			respondWithError(w, http.StatusUnauthorized, err.Error())
-			return
-		}
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		handleDatabaseError(w, err)
 		return
 	}
 	if dbToken.ExpiresAt.Before(time.Now()) || dbToken.RevokedAt.Valid {
@@ -143,11 +137,7 @@ func (router *APIRouter) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	dbUser, err := router.cfg.Db.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			respondWithError(w, http.StatusUnauthorized, "incorrect email or password")
-			return
-		}
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		handleDatabaseError(w, err)
 		return
 	}
 
