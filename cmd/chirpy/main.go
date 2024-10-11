@@ -17,6 +17,7 @@ import (
 
 func main() {
 	godotenv.Load()
+	platform := os.Getenv("PLATFORM")
 	dbUrl := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbUrl)
 	if err != nil {
@@ -26,7 +27,7 @@ func main() {
 	var (
 		dbQueries  = database.New(db)
 		mux        = http.NewServeMux()
-		cfg        = config.NewApiConfig(dbQueries)
+		cfg        = config.NewApiConfig(dbQueries, platform)
 		middleware = middleware.NewMiddleware(cfg)
 	)
 

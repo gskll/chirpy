@@ -6,11 +6,14 @@ import (
 	"github.com/gskll/chirpy2/internal/database"
 )
 
+const DEV = "dev"
+
 type ApiConfig struct {
 	FileServerHits atomic.Int32
 	Db             *database.Queries
+	Platform       string
 }
 
-func NewApiConfig(dbQueries *database.Queries) *ApiConfig {
-	return &ApiConfig{Db: dbQueries}
+func NewApiConfig(db *database.Queries, platform string) *ApiConfig {
+	return &ApiConfig{Db: db, Platform: platform}
 }

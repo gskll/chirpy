@@ -29,7 +29,13 @@ func (router *AdminRouter) GetMetrics(w http.ResponseWriter, req *http.Request) 
 }
 
 func (router *AdminRouter) ResetMetrics(w http.ResponseWriter, r *http.Request) {
+	if router.cfg.Platform != config.DEV {
+		respondWithError(w, http.StatusForbidden, "reset forbidden on current platform")
+		return
+	}
+
+	router.cfg.Db.DeleteUsers(r.Context())
 	router.cfg.FileServerHits.Store(0)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Hits reset to 0"))
+	w.Write([]byte("App reset"))
 }
