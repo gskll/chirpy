@@ -6,14 +6,14 @@ import (
 
 	"github.com/gskll/chirpy2/internal/config"
 	"github.com/gskll/chirpy2/internal/handlers"
-	"github.com/gskll/chirpy2/internal/metrics"
+	"github.com/gskll/chirpy2/internal/middleware"
 )
 
 func main() {
 	var (
-		mux     = http.NewServeMux()
-		cfg     = config.NewApiConfig()
-		metrics = metrics.NewMetrics(cfg)
+		mux        = http.NewServeMux()
+		cfg        = config.NewApiConfig()
+		middleware = middleware.NewMiddleware(cfg)
 	)
 
 	var (
@@ -22,11 +22,10 @@ func main() {
 		fileServerHandler = http.StripPrefix("/app", fileServer)
 	)
 
-	mux.Handle("/app/", metrics.Count(fileServerHandler))
-	mux.HandleFunc("GET /metrics", metrics.Get)
-	mux.HandleFunc("POST /reset", metrics.Reset)
+	mux.Handle("/app/", middleware.Metrics(fileServerHandler))
 
-	handlers.RegisterHandlers(cfg, mux)
+	handlers.RegisterAdminHandlers("/admin", cfg, mux)
+	handlers.RegisterAPIHandlers("/api", cfg, mux)
 
 	port := "8080"
 	srv := &http.Server{
