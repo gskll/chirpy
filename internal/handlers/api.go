@@ -32,12 +32,61 @@ func RegisterAPIHandlers(prefix string, cfg *config.ApiConfig, mux *http.ServeMu
 	mux.HandleFunc("POST "+prefix+"/chirps", router.CreateChirp)
 	mux.HandleFunc("GET "+prefix+"/chirps", router.GetChirps)
 	mux.HandleFunc("GET "+prefix+"/chirps/{chirpID}", router.GetChirp)
+	mux.HandleFunc("DELETE "+prefix+"/chirps/{chirpID}", router.DeleteChirp)
 }
 
 func (router *APIRouter) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
+}
+
+func (router *APIRouter) DeleteChirp(w http.ResponseWriter, r *http.Request) {
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	userId, err := auth.ValidateJWT(token, router.cfg.JWTSecret)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	chirpID := r.PathValue("chirpID")
+	chirpUUID, err := uuid.Parse(chirpID)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid chirp id")
+		return
+	}
+	dbChirp, err := router.cfg.Db.GetChirp(r.Context(), chirpUUID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			respondWithError(w, http.StatusNotFound, "Chirp not found")
+			return
+		}
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	chirp := chirp.NewChirp(dbChirp)
+
+	if chirp.UserId != userId {
+		respondWithError(w, http.StatusForbidden, "forbidden")
+		return
+	}
+
+	err = router.cfg.Db.DeleteChirp(r.Context(), chirpUUID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			respondWithError(w, http.StatusNotFound, "Chirp not found")
+			return
+		}
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (router *APIRouter) CreateChirp(w http.ResponseWriter, r *http.Request) {
