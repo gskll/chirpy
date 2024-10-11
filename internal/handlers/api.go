@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/google/uuid"
+
 	"github.com/gskll/chirpy2/internal/chirp"
 	"github.com/gskll/chirpy2/internal/config"
+	"github.com/gskll/chirpy2/internal/database"
 	"github.com/gskll/chirpy2/internal/user"
 )
 
@@ -18,7 +21,7 @@ func RegisterAPIHandlers(prefix string, cfg *config.ApiConfig, mux *http.ServeMu
 
 	mux.HandleFunc("GET "+prefix+"/healthz", router.HealthCheck)
 	mux.HandleFunc("POST "+prefix+"/users", router.CreateUser)
-	mux.HandleFunc("POST "+prefix+"/validate_chirp", router.ValidateChirpLength)
+	mux.HandleFunc("POST "+prefix+"/chirps", router.CreateChirp)
 }
 
 func (router *APIRouter) HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -48,9 +51,10 @@ func (router *APIRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusCreated, user)
 }
 
-func (router *APIRouter) ValidateChirpLength(w http.ResponseWriter, r *http.Request) {
+func (router *APIRouter) CreateChirp(w http.ResponseWriter, r *http.Request) {
 	type reqParams struct {
-		Body string `json:"body"`
+		Body   string    `json:"body"`
+		UserId uuid.UUID `json:"user_id"`
 	}
 
 	params := reqParams{}
@@ -64,8 +68,17 @@ func (router *APIRouter) ValidateChirpLength(w http.ResponseWriter, r *http.Requ
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-
 	cleaned := chirp.Clean(params.Body)
 
-	respondWithJSON(w, http.StatusOK, map[string]any{"cleaned_body": cleaned})
+	dbChirp, err := router.cfg.Db.CreateChirp(
+		r.Context(),
+		database.CreateChirpParams{Body: cleaned, UserID: params.UserId},
+	)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	chirp := chirp.NewChirp(dbChirp)
+
+	respondWithJSON(w, http.StatusCreated, chirp)
 }
