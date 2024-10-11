@@ -1,5 +1,8 @@
 build:
-	@go build -o out
+	@go build -o bin/chirpy ./cmd/chirpy/
 
 run: build
-	@./out
+	@./bin/chirpy
+
+test:
+	@go test -v ./...
