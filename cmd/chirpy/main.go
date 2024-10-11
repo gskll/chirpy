@@ -17,9 +17,12 @@ import (
 
 func main() {
 	godotenv.Load()
-	secret := os.Getenv("JWT_SECRET")
+
+	jwtSecret := os.Getenv("JWT_SECRET")
 	platform := os.Getenv("PLATFORM")
 	dbUrl := os.Getenv("DB_URL")
+	polkaKey := os.Getenv("POLKA_KEY")
+
 	db, err := sql.Open("postgres", dbUrl)
 	if err != nil {
 		log.Fatal(err)
@@ -28,7 +31,7 @@ func main() {
 	var (
 		dbQueries  = database.New(db)
 		mux        = http.NewServeMux()
-		cfg        = config.NewApiConfig(dbQueries, platform, secret)
+		cfg        = config.NewApiConfig(dbQueries, platform, jwtSecret, polkaKey)
 		middleware = middleware.NewMiddleware(cfg)
 	)
 

@@ -13,8 +13,9 @@ type ApiConfig struct {
 	Db             *database.Queries
 	Platform       string
 	JWTSecret      string
+	PolkaKey       string
 }
 
-func NewApiConfig(db *database.Queries, platform, secret string) *ApiConfig {
-	return &ApiConfig{Db: db, Platform: platform, JWTSecret: secret}
+func NewApiConfig(db *database.Queries, platform, jwtSecret, polkaKey string) *ApiConfig {
+	return &ApiConfig{Db: db, Platform: platform, JWTSecret: jwtSecret, PolkaKey: polkaKey}
 }
