@@ -1,2 +1,5 @@
-serve:
-	go build -o out && ./out
+build:
+	@go build -o out
+
+run: build
+	@./out
