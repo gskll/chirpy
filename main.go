@@ -12,7 +12,14 @@ const (
 
 func main() {
 	mux := http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.Dir(filepathRoot)))
+
+	mux.Handle("/app/", http.StripPrefix("/app/", http.FileServer(http.Dir(filepathRoot))))
+	mux.HandleFunc("/healthz", func(res http.ResponseWriter, req *http.Request) {
+		res.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		res.WriteHeader(http.StatusOK)
+
+		res.Write([]byte("OK"))
+	})
 
 	srv := &http.Server{
 		Handler: mux,
