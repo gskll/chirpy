@@ -12,8 +12,9 @@ type ApiConfig struct {
 	FileServerHits atomic.Int32
 	Db             *database.Queries
 	Platform       string
+	JWTSecret      string
 }
 
-func NewApiConfig(db *database.Queries, platform string) *ApiConfig {
-	return &ApiConfig{Db: db, Platform: platform}
+func NewApiConfig(db *database.Queries, platform, secret string) *ApiConfig {
+	return &ApiConfig{Db: db, Platform: platform, JWTSecret: secret}
 }

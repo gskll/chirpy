@@ -17,6 +17,7 @@ import (
 
 func main() {
 	godotenv.Load()
+	secret := os.Getenv("JWT_SECRET")
 	platform := os.Getenv("PLATFORM")
 	dbUrl := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbUrl)
@@ -27,7 +28,7 @@ func main() {
 	var (
 		dbQueries  = database.New(db)
 		mux        = http.NewServeMux()
-		cfg        = config.NewApiConfig(dbQueries, platform)
+		cfg        = config.NewApiConfig(dbQueries, platform, secret)
 		middleware = middleware.NewMiddleware(cfg)
 	)
 
