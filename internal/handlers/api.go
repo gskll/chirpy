@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 
@@ -23,6 +24,7 @@ func RegisterAPIHandlers(prefix string, cfg *config.ApiConfig, mux *http.ServeMu
 	mux.HandleFunc("POST "+prefix+"/users", router.CreateUser)
 	mux.HandleFunc("POST "+prefix+"/chirps", router.CreateChirp)
 	mux.HandleFunc("GET "+prefix+"/chirps", router.GetChirps)
+	mux.HandleFunc("GET "+prefix+"/chirps/{chirpID}", router.GetChirp)
 }
 
 func (router *APIRouter) HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -97,4 +99,25 @@ func (router *APIRouter) GetChirps(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, chirps)
+}
+
+func (router *APIRouter) GetChirp(w http.ResponseWriter, r *http.Request) {
+	chirpID := r.PathValue("chirpID")
+	chirpUUID, err := uuid.Parse(chirpID)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid chirp id")
+		return
+	}
+	dbChirp, err := router.cfg.Db.GetChirp(r.Context(), chirpUUID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			respondWithError(w, http.StatusNotFound, "Chirp not found")
+			return
+		}
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	chirp := chirp.NewChirp(dbChirp)
+
+	respondWithJSON(w, http.StatusOK, chirp)
 }
