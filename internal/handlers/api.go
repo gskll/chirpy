@@ -33,6 +33,8 @@ func RegisterAPIHandlers(prefix string, cfg *config.ApiConfig, mux *http.ServeMu
 	mux.HandleFunc("GET "+prefix+"/chirps", router.GetChirps)
 	mux.HandleFunc("GET "+prefix+"/chirps/{chirpID}", router.GetChirp)
 	mux.HandleFunc("DELETE "+prefix+"/chirps/{chirpID}", router.DeleteChirp)
+
+	mux.HandleFunc("POST "+prefix+"/polka/webhooks", router.UpgradeUser)
 }
 
 func (router *APIRouter) HealthCheck(w http.ResponseWriter, r *http.Request) {
