@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/gskll/chirpy2/internal/auth"
 	"github.com/gskll/chirpy2/internal/chirp"
 	"github.com/gskll/chirpy2/internal/config"
 	"github.com/gskll/chirpy2/internal/database"
@@ -21,7 +22,10 @@ func RegisterAPIHandlers(prefix string, cfg *config.ApiConfig, mux *http.ServeMu
 	router := APIRouter{cfg: cfg}
 
 	mux.HandleFunc("GET "+prefix+"/healthz", router.HealthCheck)
+
 	mux.HandleFunc("POST "+prefix+"/users", router.CreateUser)
+	mux.HandleFunc("POST "+prefix+"/login", router.LoginUser)
+
 	mux.HandleFunc("POST "+prefix+"/chirps", router.CreateChirp)
 	mux.HandleFunc("GET "+prefix+"/chirps", router.GetChirps)
 	mux.HandleFunc("GET "+prefix+"/chirps/{chirpID}", router.GetChirp)
@@ -35,7 +39,8 @@ func (router *APIRouter) HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 func (router *APIRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 	type reqParams struct {
-		Email string `json:"email"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 
 	params := reqParams{}
@@ -44,13 +49,55 @@ func (router *APIRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dbUser, err := router.cfg.Db.CreateUser(r.Context(), params.Email)
+	hashedPassword, err := auth.HashPassword(params.Password)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	dbUser, err := router.cfg.Db.CreateUser(
+		r.Context(),
+		database.CreateUserParams{HashedPassword: hashedPassword, Email: params.Email},
+	)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	user := user.NewUser(dbUser)
+	respondWithJSON(w, http.StatusCreated, user)
+}
+
+func (router *APIRouter) LoginUser(w http.ResponseWriter, r *http.Request) {
+	type reqParams struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	params := reqParams{}
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	dbUser, err := router.cfg.Db.GetUserByEmail(r.Context(), params.Email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			respondWithError(w, http.StatusUnauthorized, "incorrect email or password")
+			return
+		}
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = auth.CheckPasswordHash(params.Password, dbUser.HashedPassword)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "incorrect email or password")
+		return
+	}
+
+	user := user.NewUser(dbUser)
+
 	respondWithJSON(w, http.StatusCreated, user)
 }
 
